@@ -1,3 +1,5 @@
+**This is a Work-In-Progess fork of `node-log-buffer` to make it compatible with browsers too.**
+
 log-buffer
 ==========
 
