@@ -1,7 +1,7 @@
 {
 	"name": "console-buffer",
 	"description": "Buffer calls to console.log, console.warn, etc. for high performance logging",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"author": "Dani Glore (https://github.com/Floofies)",
 	"contributors": [
 		"Dave Eddy <dave@daveeddy.com> (http://www.daveeddy.com)"
