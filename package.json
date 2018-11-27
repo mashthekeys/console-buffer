@@ -25,10 +25,10 @@
 
 	},
 	"main": "index.js",
-	"unpkg": "dist/consoleBuffer.min.js",
+	"unpkg": "/dist/console-buffer.min.js",
 	"files": [
-		"dist/consoleBuffer.js",
-		"dist/consoleBuffer.min.js"
+		"dist/console-buffer.js",
+		"dist/console-buffer.min.js"
 	],
 	"keywords": [
 		"console",
