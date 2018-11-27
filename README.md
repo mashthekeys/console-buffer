@@ -23,7 +23,7 @@ default). In NodeJS, the buffer also flushes when the process exits.
 Building for Browsers
 ---------------------
 
-Bundle `index.js` with Browserify in standalone mode, which should include a copy of the NodeJS `util` module to be used inside this module. The main bundle (`consoleBuffer.js`) and an UglifyJS2 minified version (`consoleBuffer.min.js`) will be saved to the `dist` directory.
+Bundle `index.js` with Browserify in standalone mode, which should include a copy of the NodeJS `util` module to be used inside this module. The main bundle (`console-buffer.js`) and an UglifyJS2 minified version (`console-buffer.min.js`) will be saved to the `dist` directory.
 
 You can just run the included NPM script which does this:
 
