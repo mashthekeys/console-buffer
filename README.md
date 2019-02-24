@@ -114,3 +114,7 @@ setInterval(function() {
 ```
 
 This will flush automatically at 8k of data as well as every 5 seconds.
+
+### Flushing the Buffer Without Logging
+
+`logBuffer.clear()` will empty the contents of the buffer without logging them to the console.
