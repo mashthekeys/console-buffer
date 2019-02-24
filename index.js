@@ -50,10 +50,13 @@ ConsoleBuffer.prototype.log = function (name, args) {
 	this.buffer.push(descriptors[name](str));
 	if (this.size > this.limit) this.flush();
 };
-ConsoleBuffer.prototype.flush = function () {
-	for (const descriptor of this.buffer) descriptor.flush();
+ConsoleBuffer.prototype.clear = function () {
 	this.buffer = [];
 	this.size = 0;
+};
+ConsoleBuffer.prototype.flush = function () {
+	for (const descriptor of this.buffer) descriptor.flush();
+	this.clear();
 };
 ConsoleBuffer.prototype.patchConsole = function (name) {
 	console[name] = (...args) => this.log(name, args);
