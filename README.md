@@ -1,6 +1,8 @@
 console-buffer
 ==========
 
+[![NPM](https://nodei.co/npm/console-buffer.png)](https://nodei.co/npm/console-buffer/)
+
 Buffer calls to `console.log`, `console.warn`, etc. for deferred logging in NodeJS and web browsers.
 
 Description
