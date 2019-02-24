@@ -20,7 +20,7 @@
 	},
 	"scripts": {
 		"bundle": "browserify ./index.js -s consoleBuffer -o ./dist/console-buffer.js && uglifyjs ./dist/console-buffer.js -o ./dist/console-buffer.min.js",
-		"prepare": "npm run bundle",
+		"prepare": "npm run test && npm run bundle",
 		"test": "for f in tests/*; do echo \"$f\"; node \"$f\"; done; echo 'passed!'; exit 0"
 
 	},
