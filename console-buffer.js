@@ -1,6 +1,11 @@
 const util = require('util');
 const nsTable = require("nodestringtable");
 const byteLength = require('byte-length').byteLength;
+
+let global_process;
+try {
+	global_process = process;
+} catch (referenceError) {}
 function BufferDescriptor(func, str = "") {
 	this.func = func;
 	this.str = str;
@@ -27,6 +32,8 @@ function ConsoleBuffer(limit = 8192, prefix = null) {
 	this.buffer = [];
 	this.limit = limit;
 	this.prefix = prefix;
+
+	global_process && global_process.on('exit', () => this.flush());
 }
 ConsoleBuffer.prototype.log = function (name, args) {
 	if (name === "table") var str = nsTable.apply(null, args);
