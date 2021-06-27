@@ -44,7 +44,9 @@ function ConsoleBuffer(console, limit = 8192, prefix = null) {
 
   this.patch(limit, prefix);
 
-  global_process && global_process.on('exit', () => this.flush());
+  if (global_process) {
+    global_process.on('exit', this.processExitListener = () => this.flush());
+  }
 }
 ConsoleBuffer.prototype.log = function (name, args) {
   if (name === "table") var str = nsTable.apply(null, args);
