@@ -1,7 +1,7 @@
 {
   "name": "@mashthekeys/console-buffer",
-  "version": "1.1.1",
-  "description": "Buffer calls to console.log, console.warn, etc. for deferred logging in NodeJS and web browsers.  Forked to provide ConsoleBuffer constructor independently of replacing the global console.",
+  "version": "1.1.2",
+  "description": "Buffer calls to console.log, console.warn, etc. for deferred logging in NodeJS and web browsers.  Forked tConsoleBuffero provide  constructor independently of replacing the global console.",
   "scripts": {
     "bundle": "browserify ./index.js -s consoleBuffer -o ./dist/console-buffer.js && uglifyjs ./dist/console-buffer.js -o ./dist/console-buffer.min.js",
     "prepare": "npm run test && npm run bundle",
