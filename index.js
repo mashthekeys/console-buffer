@@ -23,6 +23,7 @@ function ConsoleBuffer(console, limit = 8192, prefix = null) {
   this.console = console;
   this.limit = limit;
   this.prefix = prefix;
+  this.size = 0;
 
   const cWarn = console.warn.bind(console);
   const cLog = console.log.bind(console);
