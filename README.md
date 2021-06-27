@@ -1,9 +1,10 @@
-console-buffer
+@mashthekeys/console-buffer
 ==========
 
-[![NPM](https://nodei.co/npm/console-buffer.png)](https://nodei.co/npm/console-buffer/)
+[![NPM](https://nodei.co/npm/@mashthekeys/console-buffer.png)](https://nodei.co/npm/@mashthekeys/console-buffer/)
 
 Buffer calls to `console.log`, `console.warn`, etc. for deferred logging in NodeJS and web browsers.
+Forked to provide ConsoleBuffer constructor independently of replacing the global console.
 
 Description
 -----------
@@ -38,7 +39,7 @@ Example
 
 In NodeJS
 ``` js
-require('console-buffer');
+require('@mashthekeys/console-buffer');
 console.log('Hello'); // Buffered
 console.log('world'); // Buffered
 // Flushed at exit or 8k of data
@@ -54,7 +55,7 @@ logbuffer.flush(); // Flushed
 
 `console._LOG_BUFFER` is also defined when this module is included for the first time, and is set to the module.
 ```js
-require('console-buffer');
+require('@mashthekeys/console-buffer');
 console.log('Hello'); // Buffered
 console.log('world'); // Buffered
 console._LOG_BUFFER.flush() // Flushed
@@ -71,7 +72,7 @@ You can specify an alternative buffer size to use for automatic flushing like
 this:
 
 ``` js
-require('console-buffer')(4096); // Buffer will flush at 4k
+require('@mashthekeys/console-buffer')(4096); // Buffer will flush at 4k
 ```
 
 ### Prefixing Logs
@@ -81,13 +82,13 @@ You can specify a string or callback function which returns a string which will 
 Specify a string. Here, all log statements will be prepended `MyLog: ` when flushed:
 
 ```js
-require('console-buffer')(4096, 'MyLog: ');
+require('@mashthekeys/console-buffer')(4096, 'MyLog: ');
 ```
 
 Specify a callback function which returns a string. Here, all log statements will be prepended by `2013-04-27T04:37:24.703Z: ` as an example:
 
 ``` js
-require('console-buffer')(4096, function() {
+require('@mashthekeys/console-buffer')(4096, function() {
 	return new Date().toISOString() + ': ';
 });
 ```
@@ -97,7 +98,7 @@ require('console-buffer')(4096, function() {
 This module also exposes the `flush` function used to flush all buffers, so you can manually invoke a flush:
 
 ``` js
-const logbuffer = require('console-buffer');
+const logbuffer = require('@mashthekeys/console-buffer');
 console.log('hello'); // Buffered
 console.log('world'); // Buffered
 logbuffer.flush(); // Flushed
@@ -107,7 +108,7 @@ Also, you can specify an interval to automatically flush all buffers so logs
 don't get held in memory indefinitely.
 
 ``` js
-const logbuffer = require('console-buffer');
+const logbuffer = require('@mashthekeys/console-buffer');
 setInterval(function() {
   logbuffer.flush();
 }, 5000); // Flush every 5 seconds
