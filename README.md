@@ -38,41 +38,37 @@ Example
 -------
 
 In NodeJS
-``` js
-require('@mashthekeys/console-buffer');
+```js
+require('@mashthekeys/console-buffer')(console);
 console.log('Hello'); // Buffered
 console.log('world'); // Buffered
 // Flushed at exit or 8k of data
 ```
 
-In Browsers
-``` js
-console.log('Hello'); // Buffered
-console.log('world'); // Buffered
-// Flushed manually or at 8k of data (no automatic flush on exit)
-logbuffer.flush(); // Flushed
-```
-
-`console._LOG_BUFFER` is also defined when this module is included for the first time, and is set to the module.
-```js
-require('@mashthekeys/console-buffer');
-console.log('Hello'); // Buffered
-console.log('world'); // Buffered
-console._LOG_BUFFER.flush() // Flushed
-```
-
 Customization
 -------------
 
-If using the module in web browsers, you can replace any of the following `require(...)(...)` with `consoleBuffer(...)`.
+### Patch custom console
+
+To patch a custom console or logger instance, pass the instance as the first parameter.
+
+```js
+const logger = require('some-package')();
+
+const buffer = require('@mashthekeys/console-buffer')(logger);
+logger.log('Hello'); // Buffered
+logger.log('world'); // Buffered
+// Flushed at exit or 8k of data
+// or by calling buffer.flush();
+```
 
 ### Buffer Size Limit
 
 You can specify an alternative buffer size to use for automatic flushing like
 this:
 
-``` js
-require('@mashthekeys/console-buffer')(4096); // Buffer will flush at 4k
+```js
+require('@mashthekeys/console-buffer')(console, 4096); // Buffer will flush at 4k
 ```
 
 ### Prefixing Logs
@@ -82,13 +78,13 @@ You can specify a string or callback function which returns a string which will 
 Specify a string. Here, all log statements will be prepended `MyLog: ` when flushed:
 
 ```js
-require('@mashthekeys/console-buffer')(4096, 'MyLog: ');
+require('@mashthekeys/console-buffer')(console, 4096, 'MyLog: ');
 ```
 
-Specify a callback function which returns a string. Here, all log statements will be prepended by `2013-04-27T04:37:24.703Z: ` as an example:
+Specify a callback function which returns a string. Here, all log statements will be prepended by `2021-06-27T12:44:46.123Z: ` as an example:
 
-``` js
-require('@mashthekeys/console-buffer')(4096, function() {
+```js
+require('@mashthekeys/console-buffer')(console, 4096, function() {
 	return new Date().toISOString() + ': ';
 });
 ```
@@ -98,19 +94,19 @@ require('@mashthekeys/console-buffer')(4096, function() {
 This module also exposes the `flush` function used to flush all buffers, so you can manually invoke a flush:
 
 ``` js
-const logbuffer = require('@mashthekeys/console-buffer');
+const logBuffer = require('@mashthekeys/console-buffer')(console);
 console.log('hello'); // Buffered
 console.log('world'); // Buffered
-logbuffer.flush(); // Flushed
+logBuffer.flush(); // Flushed
 ```
 
 Also, you can specify an interval to automatically flush all buffers so logs
 don't get held in memory indefinitely.
 
 ``` js
-const logbuffer = require('@mashthekeys/console-buffer');
+const logBuffer = require('@mashthekeys/console-buffer')(console);
 setInterval(function() {
-  logbuffer.flush();
+  logBuffer.flush();
 }, 5000); // Flush every 5 seconds
 ```
 

@@ -6,6 +6,7 @@ let global_process;
 try {
 	global_process = process;
 } catch (referenceError) {}
+
 function BufferDescriptor(func, str = "") {
 	this.func = func;
 	this.str = str;
@@ -13,25 +14,34 @@ function BufferDescriptor(func, str = "") {
 BufferDescriptor.prototype.flush = function () {
 	this.func(this.str);
 };
-const cWarn = console.warn;
-const cLog = console.log;
-const cError = console.error;
-const cInfo = console.info;
-const cGroup = console.group;
-const cGroupEnd = console.groupEnd;
-const descriptors = {
-	log: str => new BufferDescriptor(cLog, str),
-	warn: str => new BufferDescriptor(cWarn, str),
-	error: str => new BufferDescriptor(cError, str),
-	info: str => new BufferDescriptor(cInfo, str),
-	table: str => new BufferDescriptor(cLog, str),
-	group: str => new BufferDescriptor(cGroup, str),
-	groupEnd: Ø => new BufferDescriptor(cGroupEnd)
-};
-function ConsoleBuffer(limit = 8192, prefix = null) {
+function ConsoleBuffer(console, limit = 8192, prefix = null) {
+	if (!new.target) {
+		return new ConsoleBuffer(console, limit, prefix);
+	}
+
 	this.buffer = [];
+	this.console = console;
 	this.limit = limit;
 	this.prefix = prefix;
+
+	const cWarn = console.warn;
+	const cLog = console.log;
+	const cError = console.error;
+	const cInfo = console.info;
+	const cGroup = console.group;
+	const cGroupEnd = console.groupEnd;
+
+	this.descriptors = {
+		log: str => new BufferDescriptor(cLog, str),
+		warn: str => new BufferDescriptor(cWarn, str),
+		error: str => new BufferDescriptor(cError, str),
+		info: str => new BufferDescriptor(cInfo, str),
+		table: str => new BufferDescriptor(cLog, str),
+		group: str => new BufferDescriptor(cGroup, str),
+		groupEnd: Ø => new BufferDescriptor(cGroupEnd)
+	};
+
+	this.patch(limit, prefix);
 
 	global_process && global_process.on('exit', () => this.flush());
 }
@@ -50,7 +60,7 @@ ConsoleBuffer.prototype.log = function (name, args) {
 	// calculate the new length
 	this.size += byteLength(str);
 	// push the data, and flush if > limit
-	this.buffer.push(descriptors[name](str));
+	this.buffer.push(this.descriptors[name](str));
 	if (this.size > this.limit) this.flush();
 };
 ConsoleBuffer.prototype.clear = function () {
@@ -62,7 +72,7 @@ ConsoleBuffer.prototype.flush = function () {
 	this.clear();
 };
 ConsoleBuffer.prototype.patchConsole = function (name) {
-	console[name] = (...args) => this.log(name, args);
+	this.console[name] = (...args) => this.log(name, args);
 };
 ConsoleBuffer.prototype.patch = function (limit = null, prefix = null) {
 	this.limit = limit !== null ? limit : 8192;

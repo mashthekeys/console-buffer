@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('../')(null, function() { return '[' + new Date().toISOString() + '] '; });
+require('../')(console, null, function() { return '[' + new Date().toISOString() + '] '; });
 console.group("test");
 ['log', 'info', 'warn', 'error'].forEach(function(k) {
   process.stdout.write('Testing ' + k);

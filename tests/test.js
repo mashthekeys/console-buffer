@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-require('../');
+require('../')(console);
 
 ['log', 'info', 'warn', 'error'].forEach(function(k) {
   process.stdout.write('Testing ' + k);
