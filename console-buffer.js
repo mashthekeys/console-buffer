@@ -24,12 +24,12 @@ function ConsoleBuffer(console, limit = 8192, prefix = null) {
 	this.limit = limit;
 	this.prefix = prefix;
 
-	const cWarn = console.warn;
-	const cLog = console.log;
-	const cError = console.error;
-	const cInfo = console.info;
-	const cGroup = console.group;
-	const cGroupEnd = console.groupEnd;
+	const cWarn = console.warn.bind(console);
+	const cLog = console.log.bind(console);
+	const cError = console.error.bind(console);
+	const cInfo = console.info.bind(console);
+	const cGroup = console.group.bind(console);
+	const cGroupEnd = console.groupEnd.bind(console);
 
 	this.descriptors = {
 		log: str => new BufferDescriptor(cLog, str),
