@@ -1,85 +1,131 @@
 const util = require('util');
 const nsTable = require("nodestringtable");
-const byteLength = require('byte-length').byteLength;
 
 let global_process;
 try {
   global_process = process;
 } catch (referenceError) {}
 
-function BufferDescriptor(func, str = "") {
-  this.func = func;
-  this.str = str;
-}
-BufferDescriptor.prototype.flush = function () {
-  this.func(this.str);
-};
-function ConsoleBuffer(console, limit = 8192, prefix = null) {
+function ConsoleBuffer(console, limit = NaN, prefix = null) {
   if (!new.target) {
     return new ConsoleBuffer(console, limit, prefix);
   }
 
-  this.buffer = [];
-  this.console = console;
-  this.limit = limit;
-  this.prefix = prefix;
-  this.size = 0;
+  this._buffer = [];
+  this._console = console;
+  this._consoleMethods = Object.getPrototypeOf(console);
 
-  const cWarn = console.warn.bind(console);
-  const cLog = console.log.bind(console);
-  const cError = console.error.bind(console);
-  const cInfo = console.info.bind(console);
-  const cGroup = console.group.bind(console);
-  const cGroupEnd = console.groupEnd.bind(console);
+  this._limit = limit;
+  this._prefix = prefix;
+  this._size = 0;
 
-  this.descriptors = {
-    log: str => new BufferDescriptor(cLog, str),
-    warn: str => new BufferDescriptor(cWarn, str),
-    error: str => new BufferDescriptor(cError, str),
-    info: str => new BufferDescriptor(cInfo, str),
-    table: str => new BufferDescriptor(cLog, str),
-    group: str => new BufferDescriptor(cGroup, str),
-    groupEnd: Ø => new BufferDescriptor(cGroupEnd)
-  };
-
-  this.patch(limit, prefix);
-
-  if (global_process) {
-    global_process.on('exit', this.processExitListener = () => this.flush());
+  if (global_process != null) {
+    global_process.on('exit', this._processExitListener = () => this.flush());
   }
 }
-ConsoleBuffer.prototype.log = function (name, args) {
-  if (name === "table") var str = nsTable.apply(null, args);
-  else var str = util.format.apply(null, args);
-  if (this.prefix !== null) {
-    if (name === "table") {
-      if (typeof this.prefix === "string") str = this.prefix + "\n" + str;
-      else if (typeof this.prefix === "function") str = this.prefix() + "\n" + str;
-    } else {
-      if (typeof this.prefix === "string") str = this.prefix + str;
-      else if (typeof this.prefix === "function") str = this.prefix() + str;
-    }
+
+ConsoleBuffer.prototype.$queue = function(name, args) {
+  let message;
+
+  if (name === "table") {
+    message = nsTable.apply(null, args);
+
+    name = "info";
+  } else {
+    message = util.format.apply(null, args);
   }
-  // calculate the new length
-  this.size += byteLength(str);
+
+  let prefix;
+
+  if (this._prefix != null) {
+    if (typeof this._prefix === "function") {
+      prefix = String(this._prefix());
+    } else {
+      prefix = String(this._prefix);
+    }
+  } else {
+    prefix = "";
+  }
+
+  if (this._indent) {
+    prefix += " ".repeat(this._indent);
+  }
+
+  if (prefix != null && prefix.length) {
+    message = prefix + message.replace(/\n/g, "\n" + prefix);
+  }
+
+  // calculate the new length in characters
+  this._size += message.length;
+
   // push the data, and flush if > limit
-  this.buffer.push(this.descriptors[name](str));
-  if (this.size > this.limit) this.flush();
+  this._buffer.push([name, message]);
+
+  if (this._size > this._limit) this.flush();
 };
-ConsoleBuffer.prototype.clear = function () {
-  this.buffer = [];
-  this.size = 0;
+
+/** console.clear() empties the buffer */
+ConsoleBuffer.prototype.clear = function() {
+  this._buffer = [];
+  this._size = 0;
 };
-ConsoleBuffer.prototype.flush = function () {
-  for (const descriptor of this.buffer) descriptor.flush();
+
+/** console.flush() outputs and empties the buffer */
+ConsoleBuffer.prototype.flush = function() {
+  const console = this._console;
+  const methods = this._consoleMethods;
+
+  for (let i = 0; i < this._buffer.length; ++i) {
+    const [method, message] = this._buffer[i];
+
+    // if (method in methods) {
+      methods[method].call(console, message);
+    // } else {
+      // console[method](message);
+    // }
+  }
+
   this.clear();
 };
-ConsoleBuffer.prototype.patchConsole = function (name) {
-  this.console[name] = (...args) => this.log(name, args);
+
+/** console.read() converts the buffer to string. */
+ConsoleBuffer.prototype.read = function() {
+  return this._buffer.map(([,message]) => message).join("\n");
 };
-ConsoleBuffer.prototype.patch = function (limit = null, prefix = null) {
-  this.limit = limit !== null ? limit : 8192;
-  this.prefix = prefix;
+
+// Most console function pass through to $queue
+ConsoleBuffer.prototype.debug = function() { this.$queue("debug", arguments) };
+
+ConsoleBuffer.prototype.error = function() { this.$queue("error", arguments) };
+
+ConsoleBuffer.prototype.info = function() { this.$queue("info", arguments) };
+
+ConsoleBuffer.prototype.group = function() {
+  this.$queue("group", arguments);
+
+  this._indent += 4;
+};
+
+ConsoleBuffer.prototype.groupEnd = function() {
+  this._indent = Math.max(0, (this._indent | 0) - 4);
+
+  this._buffer.push(["groupEnd", void undefined]);
+};
+
+ConsoleBuffer.prototype.log = function() { this.$queue("log", arguments) };
+
+ConsoleBuffer.prototype.table = function() { this.$queue("table", arguments) };
+
+ConsoleBuffer.prototype.warn = function() { this.$queue("warn", arguments) };
+
+
+ConsoleBuffer.prototype.patchConsole = function (name) {
+  this._console[name] = (...args) => this[name](...args);
+};
+
+ConsoleBuffer.prototype.patch = function () {
+  // this.limit = limit !== null ? limit : 8192;
+  // this.prefix = prefix;
   this.patchConsole("log");
   this.patchConsole("warn");
   this.patchConsole("error");

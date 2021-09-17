@@ -8,6 +8,9 @@ class InstrumentedConsole {
   }
 
   // Testing API
+  isEmpty() {
+    return !this.stdout.length && !this.stderr.length;
+  }
   outputEquals(expectedValue) {
     return JSON.stringify(this.stdout) === JSON.stringify(expectedValue);
   }
@@ -22,12 +25,12 @@ class InstrumentedConsole {
   }
 
   group(...args) {
-    this.stdout.push("[");
+    this.stdout.push(args);
     this.console.group(...args);
   }
 
   groupEnd(...args) {
-    this.stdout.push("]");
+    // this.stdout.push("]");
     this.console.groupEnd(...args);
   }
 
@@ -52,6 +55,4 @@ class InstrumentedConsole {
   }
 }
 
-module.exports.InstrumentedConsole = InstrumentedConsole;
-
-module.exports.instrumentedConsole = new InstrumentedConsole(console);
+module.exports = InstrumentedConsole;
